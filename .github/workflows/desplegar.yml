@@ -1,0 +1,32 @@
+name: Desplegar a AWS
+
+# Esto hace que aparezca un botón manual en GitHub
+on: workflow_dispatch
+
+jobs:
+  desplegar-infra:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    # 1. Conectarse a AWS usando tus llaves secretas
+    - name: Configurar AWS
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    # 2. Instalar Terraform
+    - name: Instalar Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    # 3. Iniciar Terraform (Descargar plugins)
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./Terraform
+
+    # 4. APLICAR (Crear el servidor)
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
+      working-directory: ./Terraform
