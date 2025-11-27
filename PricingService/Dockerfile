@@ -1,17 +1,21 @@
-# 1. IMAGEN DE CONSTRUCCIÓN
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# 1. CONSTRUCCIÓN (Usamos el SDK 9.0)
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# OJO: Como el robot ya estará DENTRO de la carpeta, solo copiamos el archivo por su nombre
-COPY PricingService.csproj .
+# COPIAR TODO: Copiamos todo el repositorio sin filtrar
+COPY . .
+
+# NAVEGAR: Entramos a la carpeta del proyecto
+WORKDIR /src/PricingService
+
+# RESTAURAR: Ahora sí funcionará porque tenemos el SDK correcto
 RUN dotnet restore
 
-# Copiamos todo lo demás que hay en la carpeta
-COPY . .
+# PUBLICAR
 RUN dotnet publish -c Release -o /app/publish
 
-# 2. IMAGEN FINAL
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# 2. EJECUCIÓN (Usamos el Runtime 9.0)
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "PricingService.dll"]

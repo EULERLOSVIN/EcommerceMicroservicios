@@ -1,8 +1,6 @@
 name: Pipeline CI/CD Completo
 
-on:
-  push:
-    branches: [ "main", "master" ]
+on: [push]
 
 jobs:
   probar-codigo:
@@ -12,7 +10,8 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 8.0.x
+        # ACTUALIZACIÓN: Versión 9.0
+        dotnet-version: 9.0.x
     - name: Ejecutar Tests
       run: dotnet test 
 
@@ -32,9 +31,9 @@ jobs:
       - name: Construir y Subir Imagen
         uses: docker/build-push-action@v4
         with:
-          # MAGIA AQUÍ: Le decimos "Tu mundo es la carpeta PricingService"
-          context: ./PricingService
-          # Y el archivo está ahí mismo
+          # Contexto: RAÍZ
+          context: .
+          # Archivo: Dockerfile actualizado a 9.0
           file: ./PricingService/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/pricingservice:latest
