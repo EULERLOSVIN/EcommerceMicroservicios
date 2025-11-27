@@ -32,9 +32,8 @@ jobs:
       - name: Construir y Subir Imagen
         uses: docker/build-push-action@v4
         with:
-          # VUELTA A LA RAÍZ: Ponemos el punto "."
-          context: .
-          # Ruta explícita al archivo
+          # CAMBIO CLAVE: Le decimos "Tu zona de trabajo es esta carpeta"
+          context: ./PricingService
           file: ./PricingService/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/pricingservice:latest
