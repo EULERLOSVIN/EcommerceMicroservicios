@@ -1,0 +1,29 @@
+name: Guardian de Calidad (CI)
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  probar-codigo:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # 1. Bajar tu código al servidor de GitHub
+    - uses: actions/checkout@v3
+    
+    # 2. Instalar .NET 8 (igual que en tu PC)
+    - name: Instalar .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+        
+    # 3. Restaurar librerías
+    - name: Restaurar dependencias
+      run: dotnet restore
+      
+    # 4. EJECUTAR TUS PRUEBAS (La Tabla de Decisión)
+    - name: Correr Tests Unitarios
+      run: dotnet test --no-restore --verbosity normal
