@@ -5,24 +5,19 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  # TAREA 1: Ejecutar Tests Unitarios
   probar-codigo:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    
-    - name: Configurar .NET
+    - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
-        
     - name: Ejecutar Tests
-      # Este comando busca automáticamente cualquier test en la solución
       run: dotnet test 
 
-  # TAREA 2: Construir Docker y Subir a la Nube
   construir-y-subir:
-    needs: probar-codigo # Solo corre si los tests pasaron
+    needs: probar-codigo
     runs-on: ubuntu-latest
     steps:
       - name: Bajar código
@@ -37,8 +32,9 @@ jobs:
       - name: Construir y Subir Imagen
         uses: docker/build-push-action@v4
         with:
-          # IMPORTANTE: Le decimos que entre a la carpeta PricingService
-          context: ./PricingService
+          # VUELTA A LA RAÍZ: Ponemos el punto "."
+          context: .
+          # Ruta explícita al archivo
           file: ./PricingService/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/pricingservice:latest

@@ -1,18 +1,22 @@
-# 1. FASE DE CONSTRUCCIÓN
-# Usamos la imagen de .NET SDK para compilar
+# 1. IMAGEN DE CONSTRUCCIÓN
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copiamos el archivo de proyecto (Ruta simplificada)
-COPY ["PricingService.csproj", "."]
-RUN dotnet restore "./PricingService.csproj"
+# COPIAR: Le decimos explícitamente "Copia el archivo que está dentro de la carpeta PricingService"
+# y "Ponlo dentro de una carpeta PricingService aquí en el contenedor"
+COPY ["PricingService/PricingService.csproj", "PricingService/"]
 
-# Copiamos el resto del código y construimos
+# RESTAURAR: Ahora sí encontrará la ruta exacta
+RUN dotnet restore "PricingService/PricingService.csproj"
+
+# COPIAR TODO: Copiamos todo el repositorio
 COPY . .
+
+# CONSTRUIR: Entramos a la carpeta y publicamos
+WORKDIR "/src/PricingService"
 RUN dotnet publish "PricingService.csproj" -c Release -o /app/publish
 
-# 2. FASE FINAL
-# Usamos la imagen ligera para ejecutar
+# 2. IMAGEN FINAL
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/publish .
