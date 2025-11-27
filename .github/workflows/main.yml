@@ -32,9 +32,9 @@ jobs:
       - name: Construir y Subir Imagen
         uses: docker/build-push-action@v4
         with:
-          # Contexto en el PUNTO (Raíz del proyecto)
-          context: .
-          # Ruta al archivo Dockerfile
+          # MAGIA AQUÍ: Le decimos "Tu mundo es la carpeta PricingService"
+          context: ./PricingService
+          # Y el archivo está ahí mismo
           file: ./PricingService/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/pricingservice:latest
