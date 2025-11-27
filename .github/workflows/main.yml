@@ -1,29 +1,41 @@
-name: Guardian de Calidad (CI)
+name: Pipeline CI/CD Completo
 
 on:
   push:
     branches: [ "main", "master" ]
-  pull_request:
-    branches: [ "main", "master" ]
 
 jobs:
+  # TAREA 1: Juez de Calidad (Tests)
   probar-codigo:
     runs-on: ubuntu-latest
-    
     steps:
-    # 1. Bajar tu código al servidor de GitHub
     - uses: actions/checkout@v3
-    
-    # 2. Instalar .NET 8 (igual que en tu PC)
-    - name: Instalar .NET
+    - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
-        
-    # 3. Restaurar librerías
-    - name: Restaurar dependencias
-      run: dotnet restore
+    - name: Ejecutar Tests
+      run: dotnet test PricingService.Tests/PricingService.Tests.csproj
+
+  # TAREA 2: Empaquetar y Subir (Docker)
+  # SOLO se ejecuta si la tarea 1 sale bien (Green)
+  construir-y-subir:
+    needs: probar-codigo  # <--- AQUÍ ESTÁ LA MAGIA
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bajar código
+        uses: actions/checkout@v3
       
-    # 4. EJECUTAR TUS PRUEBAS (La Tabla de Decisión)
-    - name: Correr Tests Unitarios
-      run: dotnet test --no-restore --verbosity normal
+      - name: Loguearse en Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          
+      - name: Construir y Subir Imagen (Pricing)
+        uses: docker/build-push-action@v4
+        with:
+          context: ./PricingService
+          file: ./PricingService/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/pricingservice:latest
