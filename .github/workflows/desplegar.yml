@@ -1,6 +1,5 @@
 name: Desplegar a AWS
 
-# Esto hace que aparezca un botón manual en GitHub
 on: workflow_dispatch
 
 jobs:
@@ -9,7 +8,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    # 1. Conectarse a AWS usando tus llaves secretas
+    # 1. Conectarse a AWS
     - name: Configurar AWS
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -21,12 +20,10 @@ jobs:
     - name: Instalar Terraform
       uses: hashicorp/setup-terraform@v2
 
-    # 3. Iniciar Terraform (Descargar plugins)
+    # 3. Iniciar Terraform (Sin carpeta específica, usa la raíz)
     - name: Terraform Init
       run: terraform init
-      working-directory: ./Terraform
 
-    # 4. APLICAR (Crear el servidor)
+    # 4. APLICAR (Sin carpeta específica)
     - name: Terraform Apply
       run: terraform apply -auto-approve
-      working-directory: ./Terraform
