@@ -2,13 +2,14 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# EL TRUCO: Copiamos TODO (.) lo que haya en el contexto a la carpeta actual (.)
+# COPIAR TODO: Copiamos la carpeta entera del repositorio (PricingService, Inventory, etc)
 COPY . .
 
-# RESTAURAR: Al no poner nombre de archivo, dotnet buscará cualquier .csproj en la carpeta y lo usará.
-RUN dotnet restore
+# CAMINAR: Nos metemos dentro de la carpeta del proyecto explícitamente
+WORKDIR /src/PricingService
 
-# PUBLICAR
+# RESTAURAR Y PUBLICAR: Como ya estamos dentro de la carpeta, esto funcionará sí o sí
+RUN dotnet restore
 RUN dotnet publish -c Release -o /app/publish
 
 # 2. EJECUCIÓN
